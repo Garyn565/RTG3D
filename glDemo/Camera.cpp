@@ -28,7 +28,7 @@ void Camera::Init(float _screenWidth, float _screenHeight, Scene* _scene)
 {
 	//TODO: move the calculation of the Projection Matrix to Camera::Tick
 	// so that we can do the same rescaling of the aspect ratio to match the current window
-	float aspect_ratio = _screenWidth / _screenHeight;
+	aspect_ratio = _screenWidth / _screenHeight;
 	m_projectionMatrix = glm::perspective(glm::radians(m_fov), aspect_ratio, m_near, m_far);
 }
 
@@ -37,7 +37,28 @@ void Camera::Init(float _screenWidth, float _screenHeight, Scene* _scene)
 /////////////////////////////////////////////////////////////////////////////////////
 void Camera::Tick(float _dt)
 {
-	m_viewMatrix = glm::lookAt(m_pos, m_lookAt, vec3(0, 1, 0));
+    
+        // Example: Orbit around the object at m_lookAt
+        float radius = 10.0f; // Distance from the object
+        float speed = 1.0f;   // Rotation speed
+        m_dx += speed * _dt;  // Increment rotation angle
+
+        m_pos.x = m_lookAt.x + radius * cos(m_dx);
+        m_pos.z = m_lookAt.z + radius * sin(m_dx);
+        m_pos.y = m_lookAt.y; // Keep the camera at the same height
+
+        // Update view and projection matrices
+        m_viewMatrix = glm::lookAt(m_pos, m_lookAt, vec3(0, 1, 0));
+        m_projectionMatrix = glm::perspective(glm::radians(m_fov), aspect_ratio, m_near, m_far);
+    
+	
+}
+
+void Camera::rotateCamera(float _dx, float _dy) {
+
+	m_dx += _dx;
+	m_dy += _dy;
+
 }
 
 void Camera::Load(ifstream& _file)
@@ -67,3 +88,5 @@ void Camera::SetRenderValues(unsigned int _prog)
 	if (Helper::SetUniformLocation(_prog, "camPos", &loc))
 		glUniform3fv(loc, 1, glm::value_ptr(GetPos()));
 }
+
+

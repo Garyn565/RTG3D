@@ -46,6 +46,9 @@ public:
 
 	//initialise links between items in the scene
 	void Init();
+	void MouseMoved(float x, float y);
+	void CycleCamera();
+	void FpsMove(glm::vec3 direction);
 
 protected:
 

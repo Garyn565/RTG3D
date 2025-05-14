@@ -1,13 +1,14 @@
 #pragma once
 
 #include "core.h"
+#include "Camera.h"
 
 // Model an arcball / pivot camera looking at the origin (0, 0, 0).  
 // The camera by default looks down the negative z axis (using a right-handed coordinate system).  
 // Therefore 'forwards' is along the -z axis.  The camera is actually right/left handed agnostic.  
 // The encapsulated frustum however needs to know the differences for the projection matrix and frustum plane calculations
 
-class ArcballCamera {
+class ArcballCamera : public Camera{
 
 private:
 
@@ -21,7 +22,7 @@ private:
 
 	// camera position
 	//glm::vec4			cameraPos;
-
+	
 	// camera orientation basis(matrix) derived from <theta, phi>
 	//glm::mat4			R;
 
@@ -48,6 +49,7 @@ public:
 	ArcballCamera(float _theta, float _phi, float _radius, float _fovy, float _aspect, float _nearPlane, float _farPlane);
 	// create a camera with orientation <theta, phi> representing Euler angles specified in degrees and Euclidean distance 'init_radius' from the origin.  The frustum / viewplane projection coefficients are defined in init_fovy, specified in degrees spanning the entire vertical field of view angle, init_aspect (w/h ratio), init_nearPlane and init_farPlane.  If init_farPlane = 0.0 (as determined by equalf) then the resulting frustum represents an infinite perspective projection.  This is the default
 
+	void Tick(float _dt); // update the view and projection matrices
 
 	// Accessor methods for stored properties
 
@@ -58,7 +60,10 @@ public:
 	float getPhi(); 
 
 	// rotate by angles dTheta, dPhi given in degrees
-	void rotateCamera(float _dTheta, float _dPhi);
+	void rotateCamera(float _dTheta, float _dPhi)override; 
+
+	void SetRenderValues(unsigned int _prog);
+	unsigned int m_shaderProg;
 
 	// return the camera radius (distance from origin)
 	float getRadius();

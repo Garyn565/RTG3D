@@ -199,91 +199,92 @@ void renderScene()
 {
 	// Clear the rendering window
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	g_Scene->Render();
 
-	mat4 cameraTransform = g_mainCamera->projectionTransform() * g_mainCamera->viewTransform();
-
-	mat4 cameraProjection = g_mainCamera->projectionTransform();
-	mat4 cameraView = g_mainCamera->viewTransform() * translate(identity<mat4>(), -g_beastPos);
-
-#// Render principle axes - no modelling transforms so just use cameraTransform
-	if (true)
-	{
-		// Render axes 
-		glUseProgram(g_flatColourShader);
-		GLint pLocation;
-		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
-		mat4 modelTransform = identity<mat4>();
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-		g_principleAxes->render();
-	}
-
-	switch (g_showing)
-	{
-	case 0:
-	{
-		glUseProgram(g_texDirLightShader);
-
-		GLint pLocation;
-		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
-		glUniform1i(pLocation, 0); // set to point to texture unit 0 for AIMeshes
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLdirection);
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
-		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
-		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
-		if (g_creatureMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), g_beastPos) * eulerAngleY<float>(glm::radians<float>(g_beastRotation));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_creatureMesh->setupTextures();
-			g_creatureMesh->render();
-		}
-
-		if (g_planetMesh) {
-
-			// Setup transforms
-			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
-			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(4.0, 4.0, 4.0));
-			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-			g_planetMesh->setupTextures();
-			g_planetMesh->render();
-		}
-	}
-	break;
-
-	case 1:
-	{
-		// Render cube 
-		glUseProgram(g_flatColourShader);
-		GLint pLocation;
-		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
-		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
-		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
-		mat4 modelTransform = glm::translate(identity<mat4>(), vec3(2.0, 0.0, 2.0));
-		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
-
-		g_cube->render();
-		break;
-	}
-	case 2:
-		g_Scene->Render();
-	}
+//	mat4 cameraTransform = g_mainCamera->projectionTransform() * g_mainCamera->viewTransform();
+//
+//	mat4 cameraProjection = g_mainCamera->projectionTransform();
+//	mat4 cameraView = g_mainCamera->viewTransform() * translate(identity<mat4>(), -g_beastPos);
+//
+//#// Render principle axes - no modelling transforms so just use cameraTransform
+//	if (true)
+//	{
+//		// Render axes 
+//		glUseProgram(g_flatColourShader);
+//		GLint pLocation;
+//		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+//		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+//		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
+//		mat4 modelTransform = identity<mat4>();
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+//
+//		g_principleAxes->render();
+//	}
+//
+//	switch (g_showing)
+//	{
+//	case 0:
+//	{
+//		glUseProgram(g_texDirLightShader);
+//
+//		GLint pLocation;
+//		Helper::SetUniformLocation(g_texDirLightShader, "viewMatrix", &pLocation);
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+//		Helper::SetUniformLocation(g_texDirLightShader, "projMatrix", &pLocation);
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+//		Helper::SetUniformLocation(g_texDirLightShader, "texture", &pLocation);
+//		glUniform1i(pLocation, 0); // set to point to texture unit 0 for AIMeshes
+//		Helper::SetUniformLocation(g_texDirLightShader, "DIRDir", &pLocation);
+//		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLdirection);
+//		Helper::SetUniformLocation(g_texDirLightShader, "DIRCol", &pLocation);
+//		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLcolour);
+//		Helper::SetUniformLocation(g_texDirLightShader, "DIRAmb", &pLocation);
+//		glUniform3fv(pLocation, 1, (GLfloat*)&g_DLambient);
+//		if (g_creatureMesh) {
+//
+//			// Setup transforms
+//			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
+//			mat4 modelTransform = glm::translate(identity<mat4>(), g_beastPos) * eulerAngleY<float>(glm::radians<float>(g_beastRotation));
+//			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+//
+//			g_creatureMesh->setupTextures();
+//			g_creatureMesh->render();
+//		}
+//
+//		if (g_planetMesh) {
+//
+//			// Setup transforms
+//			Helper::SetUniformLocation(g_texDirLightShader, "modelMatrix", &pLocation);
+//			mat4 modelTransform = glm::translate(identity<mat4>(), vec3(4.0, 4.0, 4.0));
+//			glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+//
+//			g_planetMesh->setupTextures();
+//			g_planetMesh->render();
+//		}
+//	}
+//	break;
+//
+//	case 1:
+//	{
+//		// Render cube 
+//		glUseProgram(g_flatColourShader);
+//		GLint pLocation;
+//		Helper::SetUniformLocation(g_flatColourShader, "viewMatrix", &pLocation);
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraView);
+//		Helper::SetUniformLocation(g_flatColourShader, "projMatrix", &pLocation);
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&cameraProjection);
+//		Helper::SetUniformLocation(g_flatColourShader, "modelMatrix", &pLocation);
+//		mat4 modelTransform = glm::translate(identity<mat4>(), vec3(2.0, 0.0, 2.0));
+//		glUniformMatrix4fv(pLocation, 1, GL_FALSE, (GLfloat*)&modelTransform);
+//
+//		g_cube->render();
+//		break;
+//	}
+//	case 2:
+//		
+//	}
 
 }
 
@@ -331,6 +332,16 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			glfwSetWindowShouldClose(_window, true);
 			break;
 
+		case GLFW_KEY_C:
+			//g_scene cycle through cameras
+			g_Scene->CycleCamera();
+			break;
+
+		case GLFW_KEY_W:
+			//g_scene cycle through cameras
+			g_Scene->FpsMove(glm::vec3(0.0f,0.0f,1.0f));
+			break;
+
 		case GLFW_KEY_SPACE:
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;
@@ -367,6 +378,8 @@ void mouseMoveHandler(GLFWwindow* _window, double _xpos, double _ypos)
 
 		g_prevMouseX = _xpos;
 		g_prevMouseY = _ypos;
+
+		g_Scene->MouseMoved(dx, dy);
 	}
 }
 

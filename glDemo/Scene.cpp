@@ -10,6 +10,9 @@
 #include "Shader.h"
 #include "GameObjectFactory.h"
 #include <assert.h>
+#include "ArcballCamera.h"
+#include "Helper.h"
+#include "FpsCamera.h"
 
 Scene::Scene()
 {
@@ -134,40 +137,71 @@ Shader* Scene::GetShader(string _shaderName)
 }
 
 
-//Render Everything
-void Scene::Render()
-{
-	//TODO: Set up for the Opaque Render Pass will go here
-	//check out the example stuff back in main.cpp to see what needs setting up here
-	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
-	{
-		if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?
-		{
-			//set shader program using
-			GLuint SP = (*it)->GetShaderProg();
-			glUseProgram(SP);
+//Render Everything  
+void Scene::Render()  
+{  
+if (m_useCamera) {  
+	// Set the active camera's view and projection matrices  
+	glm::mat4 viewMatrix = m_useCamera->GetView();  
+	glm::mat4 projMatrix = m_useCamera->GetProj();  
 
-			//set up for uniform shader values for current camera
-			m_useCamera->SetRenderValues(SP);
+    GLuint shaderProgram = GetShader("TEXDIR")->GetProg(); // Use GetProg() to retrieve GLuint from Shader*
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));  
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projMatrix));  
+}  
+//TODO: Set up for the Opaque Render Pass will go here  
+//check out the example stuff back in main.cpp to see what needs setting up here  
+for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)  
+{  
+	if ((*it)->GetRP() & RP_OPAQUE)// TODO: note the bit-wise operation. Why?  
+	{  
+		//set shader program using  
+		GLuint SP = (*it)->GetShaderProg();  
+		glUseProgram(SP);  
 
-			//loop through setting up uniform shader values for anything else
-			SetShaderUniforms(SP);
+		//set up for uniform shader values for current camera  
+		m_useCamera->SetRenderValues(SP);  
 
-			//set any uniform shader values for the actual model
-			(*it)->PreRender();
+		if (m_useCamera->GetType() == "ARCBALL")  
+		{  
+			//set up for uniform shader values for current camera  
+			ArcballCamera* cam = dynamic_cast<ArcballCamera*>(m_useCamera);  
+			if (cam)  
+			{  
+				glm::mat4 viewMatrix = cam->viewTransform();  
+				glm::mat4 projMatrix = cam->projectionTransform();  
 
-			//actually render the GameObject
-			(*it)->Render();
-		}
-	}
+				GLint loc;  
+				Helper::SetUniformLocation(SP, "viewMatrix", &loc);  
+				glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(viewMatrix));  
 
-	//TODO: now do the same for RP_TRANSPARENT here
+				Helper::SetUniformLocation(SP, "projMatrix", &loc);  
+				glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(projMatrix));  
+			}  
+		}  
+		//loop through setting up uniform shader values for anything else  
+		SetShaderUniforms(SP);  
+
+		//set any uniform shader values for the actual model  
+		(*it)->PreRender();  
+
+		//actually render the GameObject  
+		(*it)->Render();  
+	}  
+}  
+
+//TODO: now do the same for RP_TRANSPARENT here  
 }
 
 void Scene::SetShaderUniforms(GLuint _shaderprog)
 {
 	//everything needs to know about all the lights
 	for (list<Light*>::iterator it = m_Lights.begin(); it != m_Lights.end(); it++)
+	{
+		(*it)->SetRenderValues(_shaderprog);
+	}
+
+	for (list<Camera*>::iterator it = m_Cameras.begin(); it != m_Cameras.end(); it++)
 	{
 		(*it)->SetRenderValues(_shaderprog);
 	}
@@ -320,8 +354,8 @@ void Scene::Init()
 		//this will be the starting camera used
 		if ((*it)->GetName() == "MAIN")
 		{
-			m_useCamera = (*it);
-			m_useCameraIndex = count;
+			m_useCamera = (*it);  //the camera u are currently using
+			m_useCameraIndex = count;  //cameras u are using in the scene/how many
 		}
 		count++;
 	}
@@ -337,5 +371,46 @@ void Scene::Init()
 	for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)
 	{
 		(*it)->Init(this);
+	}
+}
+void Scene::MouseMoved(float x, float y)
+{
+
+	if (m_useCamera)
+	{
+		m_useCamera->rotateCamera(x, y);
+	}
+
+}
+void Scene::CycleCamera()
+{
+	m_useCameraIndex++;
+	m_useCameraIndex = m_useCameraIndex % m_numCameras;
+
+	auto it = m_Cameras.begin();
+	std::advance(it, m_useCameraIndex);
+
+	m_useCamera = (*it);
+	cout << "Camera: " << m_useCamera->GetName() << endl;
+}
+void Scene::FpsMove(vec3 direction)  
+{  
+ 
+	// Ensure the camera pointer is valid before attempting to move it  
+	if (m_useCamera != nullptr)
+	{
+		// Check if the camera is of type FpsCamera and cast it accordingly  
+		FpsCamera* fpsCam = dynamic_cast<FpsCamera*>(m_useCamera);
+		if (fpsCam)
+		{
+			fpsCam->MoveCamera(direction);
+		}
+		else if (m_useCamera->GetType() == "ARCBALL")
+		{
+			std::cerr << "Error: FpsMove is not applicable for ArcballCamera." << std::endl;
+		}
+		else if (m_useCamera->GetType() == "CAMERA")
+		{
+		}
 	}
 }

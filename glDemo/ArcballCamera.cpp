@@ -1,5 +1,6 @@
 
 #include "ArcballCamera.h"
+#include "helper.h"
 
 using namespace std;
 using namespace glm;
@@ -34,6 +35,8 @@ void ArcballCamera::calculateDerivedValues() {
 
 // initialise camera parameters so it is placed at the origin looking down the -z axis (for a right-handed camera) or +z axis (for a left-handed camera)
 ArcballCamera::ArcballCamera() {
+
+	m_type = "ARCBALL";
 
 	m_theta = 0.0f;
 	m_phi = 0.0f;
@@ -71,6 +74,20 @@ ArcballCamera::ArcballCamera(float _theta, float _phi, float _radius, float _fov
 	//F.calculateWorldCoordPlanes(C, R);
 }
 
+void ArcballCamera::Tick(float _dt) {
+	// update the view and projection matrices
+	m_viewMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, -m_radius)) * glm::eulerAngleX(-m_theta) * glm::eulerAngleY(-m_phi);
+	m_projectionMatrix = glm::perspective(glm::radians<float>(m_fovY), m_aspect, m_nearPlane, m_farPlane);
+	
+	GLint loc;
+	Helper::SetUniformLocation(m_shaderProg, "viewMatrix", &loc);
+	glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)&m_viewMatrix);
+
+	//matrix for the projection transform
+	Helper::SetUniformLocation(m_shaderProg, "projMatrix", &loc);
+	glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)&m_projectionMatrix);
+	
+}
 
 #pragma region Accessor methods for stored values
 
@@ -153,6 +170,23 @@ void ArcballCamera::setFarPlaneDistance(float _farPlaneDistance) {
 
 	this->m_farPlane = _farPlaneDistance;
 	calculateDerivedValues();
+}
+void ArcballCamera::SetRenderValues(unsigned int _prog)
+{
+	GLint loc;
+	m_shaderProg = _prog;
+
+	//matrix for the view transform
+	if (Helper::SetUniformLocation(_prog, "viewMatrix", &loc))
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(GetView()));
+
+	//matrix for the projection transform
+	if (Helper::SetUniformLocation(_prog, "projMatrix", &loc))
+		glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(GetProj()));
+
+	//the current camera is at this position
+	if (Helper::SetUniformLocation(_prog, "camPos", &loc))
+		glUniform3fv(loc, 1, glm::value_ptr(GetPos()));
 }
 
 #pragma endregion

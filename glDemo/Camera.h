@@ -33,6 +33,8 @@ public:
 	//TODO: possibly pass keyboard / mouse stuff down here for player controls?
 	virtual void Tick(float _dt);
 
+	virtual void rotateCamera(float _dTheta, float _dPhi);
+
 	//load camera info from the mainfest
 	virtual void Load(ifstream& _file);
 
@@ -65,7 +67,7 @@ protected:
 	//standard transforms needed to render with this a basic camera
 	glm::mat4 m_projectionMatrix;		// projection matrix
 	glm::mat4 m_viewMatrix;			// view matrix
-
+	float aspect_ratio;			// aspect ratio of the window
 	//my camera is here
 	glm::vec3 m_pos;
 
@@ -78,5 +80,7 @@ protected:
 
 	string m_name;
 	string m_type;
+	float m_dx;
+	float m_dy;
 };
 
