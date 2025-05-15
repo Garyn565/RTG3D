@@ -20,6 +20,13 @@ FpsCamera::FpsCamera()
 void FpsCamera::Tick(float _dt)
 {
 	Camera::Tick(_dt);
+
+	float radius = 10.0f;
+	float speed = 1.0f;
+	m_dx += speed * _dt;
+	m_pos.x = m_lookAt.x + radius * cos(m_dx);
+	m_pos.z = m_lookAt.z + radius * sin(m_dx);
+	m_pos.y = m_lookAt.y;
 }
 
 void FpsCamera::rotateCamera(float _dTheta, float _dPhi)
