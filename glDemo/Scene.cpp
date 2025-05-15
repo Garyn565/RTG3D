@@ -140,15 +140,7 @@ Shader* Scene::GetShader(string _shaderName)
 //Render Everything  
 void Scene::Render()  
 {  
-if (m_useCamera) {  
-	// Set the active camera's view and projection matrices  
-	glm::mat4 viewMatrix = m_useCamera->GetView();  
-	glm::mat4 projMatrix = m_useCamera->GetProj();  
 
-    GLuint shaderProgram = GetShader("TEXDIR")->GetProg(); // Use GetProg() to retrieve GLuint from Shader*
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));  
-	glUniformMatrix4fv(glGetUniformLocation(shaderProgram, "projection"), 1, GL_FALSE, glm::value_ptr(projMatrix));  
-}  
 //TODO: Set up for the Opaque Render Pass will go here  
 //check out the example stuff back in main.cpp to see what needs setting up here  
 for (list<GameObject*>::iterator it = m_GameObjects.begin(); it != m_GameObjects.end(); it++)  
@@ -380,18 +372,27 @@ void Scene::MouseMoved(float x, float y)
 	{
 		m_useCamera->rotateCamera(x, y);
 	}
+	FpsCamera* fpsCam = dynamic_cast<FpsCamera*>(m_useCamera);
+	if(fpsCam)
+	{
+		fpsCam->rotateCamera(x, y);
+	}
+	
 
 }
-void Scene::CycleCamera()
-{
-	m_useCameraIndex++;
-	m_useCameraIndex = m_useCameraIndex % m_numCameras;
+void Scene::CycleCamera()  
+{  
+m_useCameraIndex++;  
+m_useCameraIndex = m_useCameraIndex % m_numCameras;  
 
-	auto it = m_Cameras.begin();
-	std::advance(it, m_useCameraIndex);
+auto it = m_Cameras.begin();  
+std::advance(it, m_useCameraIndex);  
 
-	m_useCamera = (*it);
-	cout << "Camera: " << m_useCamera->GetName() << endl;
+m_useCamera = (*it);  
+cout << "Camera: " << m_useCamera->GetName() << endl;  
+cout << "Camera pos: (" << m_useCamera->GetPos().x << ", "  
+	<< m_useCamera->GetPos().y << ", "  
+	<< m_useCamera->GetPos().z << ")" << endl;  
 }
 void Scene::FpsMove(vec3 direction)  
 {  

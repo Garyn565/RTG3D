@@ -198,6 +198,8 @@
     <Text Include="manifest.txt" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\Users\garyn\Downloads\Files for Workshop 07-20250514\twist.fs" />
+    <None Include="..\..\Users\garyn\Downloads\Files for Workshop 07-20250514\twist.vs" />
     <None Include="Assets\Shaders\flatColour.frag" />
     <None Include="Assets\Shaders\flatColour.vert" />
     <None Include="Assets\Shaders\texture-directional.frag" />

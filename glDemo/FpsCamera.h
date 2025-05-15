@@ -6,7 +6,7 @@ class FpsCamera : public Camera
 {
 public:
     FpsCamera();
-
+	~FpsCamera();
     void Tick(float _dt) ;
     void rotateCamera(float _dTheta, float _dPhi); // yaw, pitch
     void Load(std::ifstream& _file);

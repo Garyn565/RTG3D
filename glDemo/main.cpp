@@ -342,6 +342,20 @@ void keyboardHandler(GLFWwindow* _window, int _key, int _scancode, int _action, 
 			g_Scene->FpsMove(glm::vec3(0.0f,0.0f,1.0f));
 			break;
 
+		case GLFW_KEY_S:
+			//g_scene cycle through cameras
+			g_Scene->FpsMove(glm::vec3(0.0f, 0.0f, -1.0f));
+			break;
+
+		case GLFW_KEY_A:
+			//g_scene cycle through cameras
+			g_Scene->FpsMove(glm::vec3(1.0f, 0.0f, 0.0f));
+			break;
+
+		case GLFW_KEY_D:
+			//g_scene cycle through cameras
+			g_Scene->FpsMove(glm::vec3(-1.0f, 0.0f, 0.0f));
+			break;
 		case GLFW_KEY_SPACE:
 			g_showing++;
 			g_showing = g_showing % g_NumExamples;

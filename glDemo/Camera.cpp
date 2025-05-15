@@ -37,15 +37,7 @@ void Camera::Init(float _screenWidth, float _screenHeight, Scene* _scene)
 /////////////////////////////////////////////////////////////////////////////////////
 void Camera::Tick(float _dt)
 {
-    
-        // Example: Orbit around the object at m_lookAt
-        float radius = 10.0f; // Distance from the object
-        float speed = 1.0f;   // Rotation speed
-        m_dx += speed * _dt;  // Increment rotation angle
-
-        m_pos.x = m_lookAt.x + radius * cos(m_dx);
-        m_pos.z = m_lookAt.z + radius * sin(m_dx);
-        m_pos.y = m_lookAt.y; // Keep the camera at the same height
+   
 
         // Update view and projection matrices
         m_viewMatrix = glm::lookAt(m_pos, m_lookAt, vec3(0, 1, 0));
